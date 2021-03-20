@@ -1,5 +1,5 @@
 type AccountAPI {
-	id: ID
+	id: ID!
 	accountid: String
 	externalid: String
 	role: String
@@ -29,7 +29,7 @@ type Mutation {
 }
 
 type Query {
-	getAccountAPI(id: ID): AccountAPI
+	getAccountAPI(id: ID!): AccountAPI
 	listAccountAPIS(filter: TableAccountAPIFilterInput, limit: Int, nextToken: String): AccountAPIConnection
 }
 
