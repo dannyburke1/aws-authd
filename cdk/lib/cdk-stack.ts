@@ -1,40 +1,37 @@
 import * as cdk from '@aws-cdk/core';
-import * as api from '@aws-cdk/aws-apigateway';
+import * as appsync from '@aws-cdk/aws-appsync';
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const accountAPI = new api.RestApi(this, 'aws-account-api');
-
-    accountAPI.root.addMethod('ANY');
-    const integration = new accountAPI.HttpIntegration('http://amazon.com');
-
-    const v1 = accountAPI.root.addResource('v1');
-    const echo = v1.addResource('echo');
-    const echoMethod = echo.addMethod('GET', integration, { apiKeyRequired: true });
-    const key = accountAPI.addApiKey('ApiKey');
-
-    const plan = accountAPI.addUsagePlan('UsagePlan', {
-      name: 'Easy',
-      apiKey: key,
-      throttle: {
-        rateLimit: 10,
-        burstLimit: 2
-      }
+    const api = new appsync.GraphqlApi(this, 'AccountsAPI', {
+      name: 'cdk-notes-appsync-api',
+      schema: appsync.Schema.fromAsset('graphql/schema.graphql'),
+      authorizationConfig: {
+        defaultAuthorization: {
+          authorizationType: appsync.AuthorizationType.API_KEY,
+          apiKeyConfig: {
+            expires: cdk.Expiration.after(cdk.Duration.days(365))
+          }
+        },
+      },  
+      xrayEnabled: false,
     });
 
-  plan.addApiStage({
-    stage: accountAPI.deploymentStage,
-    throttle: [
-      {
-        method: echoMethod,
-        throttle: {
-          rateLimit: 10,
-          burstLimit: 2
-        }
-      }
-    ]
-   });
-  }
+    // Prints out the AppSync GraphQL endpoint to the terminal
+    new cdk.CfnOutput(this, "GraphQLAPIURL", {
+     value: api.graphqlUrl
+    });
+
+    // Prints out the AppSync GraphQL API key to the terminal
+    new cdk.CfnOutput(this, "GraphQLAPIKey", {
+      value: api.apiKey || ''
+    });
+
+    // Prints out the stack region to the terminal
+    new cdk.CfnOutput(this, "Stack Region", {
+      value: this.region
+    });
+   }
 }
