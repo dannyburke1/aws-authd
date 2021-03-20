@@ -1,47 +1,71 @@
-type Account {
-	id: ID!
-	name: String!
-	externalid: String!
+type AccountAPI {
+	id: ID
+	accountid: String
+	externalid: String
+	role: String
+	sso: Boolean
 }
 
-type AccountConnection {
-	items: [Account]
+type AccountAPIConnection {
+	items: [AccountAPI]
 	nextToken: String
 }
 
-input CreateAccountInput {
-	name: String!
-	externalid: String!
+input CreateAccountAPIInput {
+	accountid: String
+	externalid: String
+	role: String
+	sso: Boolean
 }
 
-input DeleteAccountInput {
+input DeleteAccountAPIInput {
 	id: ID!
 }
 
 type Mutation {
-	createAccount(input: CreateAccountInput!): Account
-	updateAccount(input: UpdateAccountInput!): Account
-	deleteAccount(input: DeleteAccountInput!): Account
+	createAccountAPI(input: CreateAccountAPIInput!): AccountAPI
+	updateAccountAPI(input: UpdateAccountAPIInput!): AccountAPI
+	deleteAccountAPI(input: DeleteAccountAPIInput!): AccountAPI
 }
 
 type Query {
-	getAccount(id: ID!): Account
-	listAccounts(filter: TableAccountFilterInput, limit: Int, nextToken: String): AccountConnection
+	getAccountAPI(id: ID): AccountAPI
+	listAccountAPIS(filter: TableAccountAPIFilterInput, limit: Int, nextToken: String): AccountAPIConnection
 }
 
 type Subscription {
-	onCreateAccount(id: ID, name: String, externalid: String): Account
-		@aws_subscribe(mutations: ["createAccount"])
-	onUpdateAccount(id: ID, name: String, externalid: String): Account
-		@aws_subscribe(mutations: ["updateAccount"])
-	onDeleteAccount(id: ID, name: String, externalid: String): Account
-		@aws_subscribe(mutations: ["deleteAccount"])
+	onCreateAccountAPI(
+		id: ID,
+		accountid: String,
+		externalid: String,
+		role: String,
+		sso: Boolean
+	): AccountAPI
+		@aws_subscribe(mutations: ["createAccountAPI"])
+	onUpdateAccountAPI(
+		id: ID,
+		accountid: String,
+		externalid: String,
+		role: String,
+		sso: Boolean
+	): AccountAPI
+		@aws_subscribe(mutations: ["updateAccountAPI"])
+	onDeleteAccountAPI(
+		id: ID,
+		accountid: String,
+		externalid: String,
+		role: String,
+		sso: Boolean
+	): AccountAPI
+		@aws_subscribe(mutations: ["deleteAccountAPI"])
 }
 
-input TableAccountFilterInput {
+input TableAccountAPIFilterInput {
 	id: TableIDFilterInput
-	name: TableStringFilterInput
+	accountid: TableStringFilterInput
 	externalid: TableStringFilterInput
+	role: TableStringFilterInput
+	sso: TableBooleanFilterInput
 }
 
 input TableBooleanFilterInput {
@@ -99,8 +123,10 @@ input TableStringFilterInput {
 	beginsWith: String
 }
 
-input UpdateAccountInput {
+input UpdateAccountAPIInput {
 	id: ID!
-	name: String
+	accountid: String
 	externalid: String
+	role: String
+	sso: Boolean
 }
